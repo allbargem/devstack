@@ -1,0 +1,47 @@
+- name: get arch from dpkg
+  shell: dpkg --print-architecture
+  register: arch
+
+- name: prepare
+  apt:
+    update_cache: yes
+    pkg:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+    - unzip
+    - git-secret
+    - python-is-python3
+
+- name: import gpg key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: /etc/apt/keyrings/docker.gpg
+
+- name: add docker repository
+  apt_repository:
+    repo: "deb [arch={{ arch.stdout }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable"
+    state: present
+    filename: docker
+
+- name: install docker
+  apt:
+    update_cache: yes
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+
+- name: usermod
+  user:
+    name: ubuntu
+    groups: docker
+    append: yes
+
+- name: install docker-compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/v2.5.0/docker-compose-linux-{{ ansible_architecture }}"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'

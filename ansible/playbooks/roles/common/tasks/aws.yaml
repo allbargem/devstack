@@ -1,0 +1,13 @@
+- name: download awscli v2
+  unarchive:
+    src: "https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_architecture }}.zip"
+    dest: /tmp/awscliv2
+    remote_src: yes
+
+- name: install awscli v2
+  shell: /tmp/awscliv2/aws/install --update
+
+- name: remove awscli directory
+  file:
+    path: /tmp/awscliv2
+    state: absent

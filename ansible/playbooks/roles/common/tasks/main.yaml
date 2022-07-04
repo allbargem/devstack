@@ -1,0 +1,7 @@
+- name: gather facts
+  setup:
+    gather_subset:
+    - hardware
+
+- include: docker.yaml
+- include: aws.yaml
