@@ -14,6 +14,12 @@
     - git-secret
     - python-is-python3
 
+- name: create a directory to store keyrings
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
 - name: import gpg key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
