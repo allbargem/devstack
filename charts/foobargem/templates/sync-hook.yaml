@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sync-secret-job
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    metadata:
+      name: sync-secret
+    spec:
+      serviceAccountName: secops
+      containers:
+      - name: sync-secret
+        image: nginx:alpine
+        resources: {}
+        env:
+          - name: SECRET_NAME
+            value: foo
+        command:
+        - sh
+        - -c
+        - 'curl -k -XPATCH -H "Content-Type: application/merge-patch+json" -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" "https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT_HTTPS/api/v1/namespaces/$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)/secrets/${SECRET_NAME}" -d "{\"metadata\":{\"annotations\":{\"sync-time\":\"$(date +%s)\"}}}"'
+      restartPolicy: Never
