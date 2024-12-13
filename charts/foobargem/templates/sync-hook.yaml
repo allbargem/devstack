@@ -13,7 +13,7 @@ spec:
       serviceAccountName: secops
       containers:
       - name: sync-secret
-        image: nginx:alpine
+        image: alpine/curl:8.9.1
         resources: {}
         env:
           - name: SECRET_NAME
